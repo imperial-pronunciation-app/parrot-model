@@ -1,0 +1,3 @@
+allosaurus
+fastapi
+pydantic
