@@ -1,16 +1,9 @@
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+
 from fastapi import FastAPI
-from allosaurus.app import read_recognizer
 
-from app.routers.phonemes import router as phonemes_router
-from app.routers.phonemes import ml_models
+from app.routers.audio_phones import router as phonemes_router
+from app.utils.model import lifespan
 
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator:
-    ml_models["default"] = read_recognizer()
-    yield
-    ml_models.clear()
 
 app = FastAPI(lifespan=lifespan)
 
