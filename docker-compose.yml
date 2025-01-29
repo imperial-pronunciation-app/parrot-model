@@ -1,0 +1,16 @@
+services:
+  web:
+    image: euanoturner/pronunciation-model:${IMAGE_TAG}
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
+  test:
+    build:
+      context: .
+      target: test
+    profiles:
+      - test

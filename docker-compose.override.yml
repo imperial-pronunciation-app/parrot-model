@@ -1,0 +1,7 @@
+services:
+  web:
+    image: pronunciation-model-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev

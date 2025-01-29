@@ -1,0 +1,121 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - '*'
+
+env:
+  REGISTRY: docker.io/${{ vars.DOCKERHUB_USERNAME }}
+  IMAGE_NAME: ${{ vars.DOCKERHUB_IMAGE }}
+
+jobs:
+  ci:
+    name: Continuous Integration
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    
+    - name: Install pre-commit
+      run: pip install pre-commit
+
+    - name: Run checks
+      run: pre-commit run --all-files
+
+    - name: Build and run tests
+      run: make test
+  
+  cd:
+    name: Continuous Deployment
+
+    needs: ci
+    if: github.ref == 'refs/heads/main' && success()
+
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          load: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          target: prod
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.CLOUD_VM_PRIV_SSH_KEY }}
+          name: id_rsa
+          known_hosts: unnecessary
+          config: |
+            Host jumphost
+              HostName shell1.doc.ic.ac.uk
+              User et422
+              IdentityFile ~/.ssh/id_rsa
+              ForwardAgent yes
+              StrictHostKeyChecking no
+            Host cloud-vm
+              HostName cloud-vm-41-85.doc.ic.ac.uk
+              User ubuntu
+              IdentityFile ~/.ssh/id_rsa
+              StrictHostKeyChecking no
+              ProxyJump jumphost
+
+      - name: Deploy to VM
+        run: |
+          scp ./deploy.sh cloud-vm:~/deploy.sh
+          scp ./docker-compose.yml cloud-vm:~/docker-compose.yml
+          ssh cloud-vm "chmod +x ~/deploy.sh && \
+                        DOCKERHUB_USERNAME='${{ vars.DOCKERHUB_USERNAME }}' \
+                        DOCKERHUB_ACCESS_TOKEN='${{ secrets.DOCKERHUB_ACCESS_TOKEN }}' \
+                        IMAGE_NAME='${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' \
+                        IMAGE_TAG='${{ github.sha }}' \
+                        bash ~/deploy.sh"
+
+      # - name: Wait for container to be up
+      #   run: |
+      #     echo "Waiting for the container to be up..."
+      #     sleep 10
+
+      # - name: Ping the application to check it's alive
+      #   run: |
+      #     for i in {1..5}; do
+
+      #       if curl -s --head  --request GET https://pronunciation-app-backend.doc.ic.ac.uk | grep "200" > /dev/null; then 
+
+      #       echo "Application is up and running!"
+      #       exit 0
+      #       else
+      #       echo "Waiting for the application to be up..."
+      #       sleep 10
+      #       fi
+      #     done
+      #     echo "Application did not start in time."
+      #     exit 1
