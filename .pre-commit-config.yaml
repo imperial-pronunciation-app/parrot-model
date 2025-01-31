@@ -9,8 +9,4 @@ repos:
   hooks:
     - id: mypy
       additional_dependencies:
-        - sqlmodel
-        # - types-python-dotenv
-        # - types-pytest
-        # - types-psycopg2
-        # - httpx
+        - types-pytest
