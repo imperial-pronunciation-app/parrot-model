@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 from allosaurus.app import read_recognizer
 from fastapi import FastAPI
 
-from app.routers.audio_phones import ml_models
+from app.routers.audio_phonemes import ml_models
 
 
 @asynccontextmanager

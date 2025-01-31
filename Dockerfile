@@ -8,6 +8,10 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 COPY ./app /code/app
 
+RUN python -m allosaurus.bin.download_model -m eng2102
+
+COPY ./resources /code/resources
+
 # ---------------------
 # Test stage
 # ---------------------

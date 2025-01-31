@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI
 
-from app.routers.audio_phones import router as phonemes_router
+from app.routers.audio_phonemes import router as phonemes_router
 from app.utils.model import lifespan
 
 
