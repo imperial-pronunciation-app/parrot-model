@@ -1,0 +1,4 @@
+allosaurus
+fastapi[standard]
+pydantic
+pytest==8.3.4
