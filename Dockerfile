@@ -26,11 +26,11 @@ CMD ["pytest"]
 # ---------------------
 FROM base AS dev
 
-CMD ["fastapi", "run", "app/main.py", "--port", "8000"]
+CMD ["fastapi", "run", "app/main.py", "--port", "8001"]
 
 # ---------------------
 # Production stage
 # ---------------------
 FROM base AS prod
 
-CMD ["fastapi", "run", "app/main.py", "--port", "8000", "--workers", "4"]
+CMD ["fastapi", "run", "app/main.py", "--port", "8001", "--workers", "4"]

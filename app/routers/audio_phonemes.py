@@ -28,7 +28,7 @@ async def phonemes(audio_file: UploadFile) -> InferPhonemesResponse:
     audio_bytes = await audio_file.read()
     wav_file = create_wav_file(audio_bytes)
     
-    inference_config = Namespace(model="eng2102", lang_id="eng", prior="prior.txt", device_id=-1, approximate=False)
+    inference_config = Namespace(model="eng2102", lang_id="eng", prior="app/prior.txt", device_id=-1, approximate=False)
     recognizer = read_recognizer(inference_config_or_name=inference_config)
     
     result = recognizer.recognize(wav_file, lang_id="eng")
