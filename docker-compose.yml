@@ -7,6 +7,8 @@ services:
     profiles:
       - dev
       - prod
+    networks:
+      - parrot-network
 
   test:
     build:
@@ -14,3 +16,8 @@ services:
       target: test
     profiles:
       - test
+
+networks:
+  parrot-network:
+    name: parrot-network
+    external: true
