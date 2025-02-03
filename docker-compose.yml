@@ -2,11 +2,13 @@ services:
   web:
     image: euanoturner/pronunciation-model:${IMAGE_TAG}
     ports:
-      - "8001:8000"
+      - "8001:8001"
     restart: unless-stopped
     profiles:
       - dev
       - prod
+    networks:
+      - parrot-network
 
   test:
     build:
@@ -14,3 +16,8 @@ services:
       target: test
     profiles:
       - test
+
+networks:
+  parrot-network:
+    name: parrot-network
+    external: true
