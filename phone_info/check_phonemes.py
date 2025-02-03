@@ -1,23 +1,27 @@
 import json
+import os
 
 
 # Load the phones from the all_phones.txt file
-with open('/home/euan/Documents/imperial/third_year/segp/parrot-model/phone_info/all_phones.txt', 'r') as all_file:
+with open('phone_info/all_phones.txt', 'r') as all_file:
     all_phones = set(all_file.read().split())
 
 # Load the phones from the allowed_phones.txt file
-with open('/home/euan/Documents/imperial/third_year/segp/parrot-model/phone_info/allowed_phones.txt', 'r') as allowed_file:
+with open('phone_info/allowed_phones.txt', 'r') as allowed_file:
     allowed_phones = set(allowed_file.read().split())
 
 # Load the phoible_2176.json file
-with open('/home/euan/Documents/imperial/third_year/segp/parrot-model/resources/phoible_2176.json', 'r') as phoible_file:
+phoible_path = os.path.join('resources', 'phoible_2176.json')
+with open(phoible_path, 'r') as phoible_file:
     phoible_data = json.load(phoible_file)
 
 # Load the phonemes.json file
-with open('/home/euan/Documents/imperial/third_year/segp/parrot-model/resources/phonemes.json', 'r') as phonemes_file:
+phoneme_path = os.path.join('resources', 'phonemes.json')
+with open(phoneme_path, 'r') as phonemes_file:
     phonemes_data = json.load(phonemes_file)
 
-with open('/home/euan/Documents/imperial/third_year/segp/parrot-model/app/prior.txt', 'r') as prior_file:
+prior_path = os.path.join('app', 'prior.txt')
+with open(prior_path, 'r') as prior_file:
     prior_data = prior_file.readlines()
 
 # Extract phones from prior.txt
