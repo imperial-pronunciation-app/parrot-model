@@ -13,7 +13,7 @@ ml_models: Dict[str, None] = {}
 def map_phones_to_phonemes(phones: List[str], mapping: Dict[str, str]) -> List[str]:
     phonemes = []   
     for phone in phones:
-        phoneme = mapping[phone] #  prior.txt should ensure that no phones are produced we do not have mappings fro
+        phoneme = mapping.get(phone, "<unknown>")
         phonemes.append(phoneme)
     return phonemes
 
