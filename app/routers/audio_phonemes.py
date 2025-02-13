@@ -6,6 +6,7 @@ from fastapi import APIRouter, UploadFile
 from noisereduce import reduce_noise
 from scipy.io import wavfile
 import numpy as np
+import tempfile
 
 from app.schemas.audio_phonemes import InferPhonemesResponse
 
@@ -21,9 +22,9 @@ def map_phones_to_phonemes(phones: List[str], mapping: Dict[str, str]) -> List[s
     return phonemes
 
 def create_wav_file(audio_bytes: bytes) -> str:
-    with open("audio.wav", "wb") as f:
-        f.write(audio_bytes)
-    return "audio.wav"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav:
+        temp_wav.write(audio_bytes)
+        return temp_wav.name
 
 @router.post("/api/v1/infer_phonemes", response_model = InferPhonemesResponse)
 async def phonemes(audio_file: UploadFile) -> InferPhonemesResponse:
