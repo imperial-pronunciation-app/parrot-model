@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from allosaurus.app import Namespace, read_recognizer
 from fastapi import APIRouter, UploadFile
+from noisereduce import reduce_noise
 
 from app.schemas.audio_phonemes import InferPhonemesResponse
 
@@ -25,8 +26,11 @@ def create_wav_file(audio_bytes: bytes) -> str:
 @router.post("/api/v1/infer_phonemes", response_model = InferPhonemesResponse)
 async def phonemes(audio_file: UploadFile) -> InferPhonemesResponse:
     
-    audio_bytes = await audio_file.read()
-    wav_file = create_wav_file(audio_bytes)
+    rate, audio_bytes = await audio_file.read()
+
+    reduced_noise = reduce_noise(y=audio_bytes, sr=rate)
+
+    wav_file = create_wav_file(reduced_noise)
     
     inference_config = Namespace(model="eng2102", lang_id="eng", prior="app/prior.txt", device_id=-1, approximate=False)
     recognizer = read_recognizer(inference_config_or_name=inference_config)
