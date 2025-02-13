@@ -1,12 +1,11 @@
 import json
+import tempfile
 from typing import Dict, List
 
 from allosaurus.app import Namespace, read_recognizer
 from fastapi import APIRouter, UploadFile
 from noisereduce import reduce_noise
 from scipy.io import wavfile
-import numpy as np
-import tempfile
 
 from app.schemas.audio_phonemes import InferPhonemesResponse
 
