@@ -31,7 +31,13 @@ async def phonemes(audio_file: UploadFile) -> InferPhonemesResponse:
     wav_file = create_wav_file(audio_bytes)
 
     rate, data = wavfile.read(wav_file)
-    nframes, nchannels = data.shape
+
+    if len(data.shape) == 1:
+        nchannels, nframes = 1, len(data)
+        data = data.reshape(1, -1)
+    else:
+        nframes, nchannels = data.shape
+
     reduced_data = reduce_noise(y=data.reshape(nchannels, nframes), sr=rate)
     wavfile.write(wav_file, rate, reduced_data.reshape(nframes, nchannels))
     
