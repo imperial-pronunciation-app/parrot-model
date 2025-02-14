@@ -4,4 +4,3 @@ pydantic
 pytest==8.3.4
 noisereduce
 scipy
-numpy
