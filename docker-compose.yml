@@ -3,6 +3,9 @@ services:
     image: euanoturner/pronunciation-model:${IMAGE_TAG}
     ports:
       - "8001:8001"
+    environment:
+      - MODEL=${MODEL}
+      - LANG_ID=${LANG_ID}
     restart: unless-stopped
     profiles:
       - dev
