@@ -7,10 +7,10 @@ set -e  # Exit on any error
 : "${DOCKERHUB_ACCESS_TOKEN:?Must set DOCKERHUB_ACCESS_TOKEN}"
 : "${IMAGE_NAME:?Must set IMAGE_NAME}"
 : "${IMAGE_TAG:?Must set IMAGE_TAG}"
-: "${MODEL:?Must set MODEL}"
-: "${LANG_ID:?Must set LANG_ID}"
+: "${ALLOSAURUS_MODEL:?Must set ALLOSAURUS_MODEL}"
+: "${LANG:?Must set LANG}"
 
-COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-"parrot-model-${MODEL_ID}"}
+COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-"parrot-model-${LANG}"}
 
 echo "🔑 Logging into Docker Hub..."
 echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin

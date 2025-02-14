@@ -12,8 +12,8 @@ router = APIRouter()
 ml_models: Dict[str, None] = {}
 
 # Define model's parameters
-MODEL = os.getenv("MODEL", "eng2102")
-LANG_ID = os.getenv("LANGUAGE", "eng")
+ALLOSAURUS_MODEL = os.getenv("ALLOSAURUS_MODEL", "eng2102")
+LANG = os.getenv("LANG", "eng")
 
 def map_phones_to_phonemes(phones: List[str], mapping: Dict[str, str]) -> List[str]:
     phonemes = []   
@@ -33,10 +33,10 @@ async def phonemes(audio_file: UploadFile) -> InferPhonemesResponse:
     audio_bytes = await audio_file.read()
     wav_file = create_wav_file(audio_bytes)
     
-    inference_config = Namespace(model=MODEL, lang_id=LANG_ID, prior=f"/app/priors/{LANG_ID}.txt", device_id=-1, approximate=False)
+    inference_config = Namespace(model=ALLOSAURUS_MODEL, lang_id=LANG, prior=f"/app/priors/{LANG}.txt", device_id=-1, approximate=False)
     recognizer = read_recognizer(inference_config_or_name=inference_config)
     
-    result = recognizer.recognize(wav_file, lang_id=LANG_ID)
+    result = recognizer.recognize(wav_file, lang_id=LANG)
     phones = result.split(" ")
     with open('resources/phoible_2176.json', 'r') as f:
         phoneme_mapping = json.load(f)

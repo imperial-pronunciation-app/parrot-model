@@ -4,8 +4,8 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - MODEL=${MODEL}
-      - LANG_ID=${LANG_ID}
+      - ALLOSAURUS_MODEL=${ALLOSAURUS_MODEL}
+      - LANG=${LANG}
     restart: unless-stopped
     profiles:
       - dev
