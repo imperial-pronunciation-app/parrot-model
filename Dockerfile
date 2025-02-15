@@ -10,7 +10,7 @@ COPY ./app /code/app
 
 RUN python -m allosaurus.bin.download_model -m eng2102
 
-COPY ./resources /code/resources
+COPY ./config /code/config
 
 # ---------------------
 # Test stage
