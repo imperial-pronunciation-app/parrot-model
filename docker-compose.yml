@@ -1,5 +1,5 @@
 services:
-  web:
+  multi-lang-model:
     image: euanoturner/pronunciation-model:${IMAGE_TAG}
     deploy:
       replicas: 2
@@ -21,7 +21,7 @@ services:
       - parrot-network
       - parrot-model-network
     depends_on:
-      - web
+      - multi-lang-model
 
   test:
     build:
