@@ -91,6 +91,7 @@ jobs:
       - name: Deploy to VM
         run: |
           scp ./deploy.sh cloud-vm:~/deploy.sh
+          scp ./nginx.conf cloud-vm:~/nginx.conf
           scp ./docker-compose.yml cloud-vm:~/docker-compose.yml
           ssh cloud-vm "chmod +x ~/deploy.sh && \
                         DOCKERHUB_USERNAME='${{ vars.DOCKERHUB_USERNAME }}' \
