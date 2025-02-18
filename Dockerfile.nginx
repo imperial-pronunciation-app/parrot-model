@@ -1,0 +1,7 @@
+FROM nginx:latest
+
+# Copy your custom Nginx config into the container
+COPY ./nginx.conf /etc/nginx/nginx.conf
+
+# Ensure Nginx runs in the foreground
+CMD ["nginx", "-g", "daemon off;"]
