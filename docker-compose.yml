@@ -11,9 +11,9 @@ services:
       - parrot-model-network
 
   load-balancer:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     profiles:
       - dev
       - prod
