@@ -1,8 +1,8 @@
 import tempfile
 
 from noisereduce import reduce_noise
-from scipy.io import wavfile
-
+from pedalboard.io import AudioFile
+from pedalboard import *
 
 def create_wav_file(audio_bytes: bytes) -> str:
     """Creates a temporary WAV file from given audio bytes."""
@@ -12,17 +12,16 @@ def create_wav_file(audio_bytes: bytes) -> str:
 
 def process_audio(wav_file: str) -> None:
     """Reads a WAV file, reduces noise, and returns processed audio data."""
-    rate, data = wavfile.read(wav_file)
-
-    # Handle mono vs stereo
-    if len(data.shape) == 1:
-        nchannels, nframes = 1, len(data)
-        data = data.reshape(1, -1)
-    else:
-        nframes, nchannels = data.shape
-
-    # Noise reduction
-    reduced_data = reduce_noise(y=data.reshape(nchannels, nframes), sr=rate)
-
-    # Save the processed file
-    wavfile.write(wav_file, rate, reduced_data.reshape(nframes, nchannels))
+    sr=44100
+    with AudioFile(wav_file).resampled_to(sr) as f:
+        audio = f.read(f.frames)
+    reduced_noise = reduce_noise(y=audio, sr=sr, stationary=True, prop_decrease=0.8)
+    board = Pedalboard([
+        NoiseGate(threshold_db=-20, ratio=2, release_ms=250),
+        Compressor(threshold_db=-12, ratio=4),
+        LowShelfFilter(cutoff_frequency_hz=400, gain_db=10, q=1),
+        Gain(gain_db=2)
+    ])
+    effected = board(reduced_noise, sr)
+    with AudioFile(wav_file, 'w', sr, effected.shape[0]) as f:
+        f.write(effected)
