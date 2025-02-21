@@ -1,8 +1,9 @@
 import tempfile
 
 from noisereduce import reduce_noise
+from pedalboard import Compressor, Gain, LowShelfFilter, NoiseGate, Pedalboard
 from pedalboard.io import AudioFile
-from pedalboard import *
+
 
 def create_wav_file(audio_bytes: bytes) -> str:
     """Creates a temporary WAV file from given audio bytes."""
