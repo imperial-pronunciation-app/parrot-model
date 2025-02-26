@@ -2,7 +2,7 @@ services:
   multi-lang-model:
     image: euanoturner/pronunciation-model:${IMAGE_TAG}
     deploy:
-      replicas: 2
+      replicas: 1
     restart: unless-stopped
     profiles:
       - dev
