@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile, Form
 
 from app.schemas.audio_phonemes import InferPhonemesResponse
-from app.services.audio_processing import create_wav_file, process_audio, detect_audio_start_time
+from app.services.audio_processing import create_wav_file, process_audio, trim_audio
 from app.services.inference import infer_phonemes
 from config.config import SUPPORTED_LANGUAGES
 
@@ -18,9 +18,9 @@ async def phonemes(lang: str, audio_file: UploadFile, attempt_word: Annotated[st
         )
 
     audio_bytes = await audio_file.read()
-    wav_file = create_wav_file(audio_bytes)
+    wav_file = create_wav_file(audio_bytes, persist=True)
     
-    detect_audio_start_time(wav_file, attempt_word)
+    trim_audio(wav_file, attempt_word)
 
     process_audio(wav_file)
 
