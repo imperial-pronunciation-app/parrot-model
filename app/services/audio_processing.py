@@ -1,10 +1,12 @@
-import tempfile
 import re
+import tempfile
+from typing import Dict
+
 from noisereduce import reduce_noise
 from pedalboard import Compressor, Gain, LowShelfFilter, NoiseGate, Pedalboard
 from pedalboard.io import AudioFile
 from pydub import AudioSegment
-from typing import Dict, Tuple, Optional
+
 
 ml_models: Dict[str, None] = {}
 BUFFER_MS = 250
@@ -16,7 +18,7 @@ def create_wav_file(audio_bytes: bytes) -> str:
         return temp_wav.name
 
 def trim_audio(wav_file: str, attempt_word: str) -> None:
-    result = ml_models["whisper"].transcribe(
+    result = ml_models["whisper"].transcribe( # type: ignore
         wav_file,
         word_timestamps=True
     )
