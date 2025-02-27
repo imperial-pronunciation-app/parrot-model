@@ -50,8 +50,8 @@ def trim_audio(wav_file: str, attempt_word: str) -> None:
 
         audio_length = len(audio)
         safe_start = max(0, start_time * 1000 - buffer)
-        safe_end = min(audio_length, end_time * 1000)
-        trimmed_audio = audio[safe_start:]
+        safe_end = min(audio_length, end_time * 1000 + buffer)
+        trimmed_audio = audio[safe_start:safe_end]
         trimmed_audio.export(wav_file, format="wav")
         print("trimmed")
 
