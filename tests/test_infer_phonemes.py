@@ -13,7 +13,21 @@ def test_valid_phoneme_inference(lang: str) -> None:
             data = {"attempt_word": "hello"}
             response = client.post(f"/api/v1/{lang}/infer_phonemes", files=files, data=data)
         assert response.status_code == 200
-        assert "phonemes" in response.json()
+        data = response.json()
+        assert data["success"]
+        assert data["phonemes"] is not None
+
+@pytest.mark.parametrize("lang", SUPPORTED_LANGUAGES)
+def test_garbage_detection(lang: str) -> None:
+    with TestClient(app) as client:
+        with open('tests/assets/hello.wav', 'rb') as f:
+            files = {"audio_file": f}
+            data = {"attempt_word": "banana"}
+            response = client.post(f"/api/v1/{lang}/infer_phonemes", files=files, data=data)
+        assert response.status_code == 200
+        data = response.json()
+        assert not data["success"]
+        assert data["phonemes"] is None
 
 def test_invalid_language() -> None:
     with TestClient(app) as client:
