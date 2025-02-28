@@ -1,8 +1,8 @@
-from typing import List, Optional
+from typing import List
 
 from pydantic import BaseModel
 
 
 class InferPhonemesResponse(BaseModel):
-    phonemes: Optional[List[str]]
+    phonemes: List[str]
     success: bool # for clarity

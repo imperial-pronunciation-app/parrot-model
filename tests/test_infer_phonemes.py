@@ -27,7 +27,7 @@ def test_garbage_detection(lang: str) -> None:
         assert response.status_code == 200
         data = response.json()
         assert not data["success"]
-        assert data["phonemes"] is None
+        assert data["phonemes"] == []
 
 def test_invalid_language() -> None:
     with TestClient(app) as client:

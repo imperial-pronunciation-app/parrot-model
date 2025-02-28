@@ -23,7 +23,7 @@ async def phonemes(lang: str, audio_file: UploadFile, attempt_word: Annotated[st
     
     success = trim_audio(wav_file, attempt_word)
     if not success:
-        return InferPhonemesResponse(phonemes=None, success=False)
+        return InferPhonemesResponse(phonemes=[], success=False)
 
     process_audio(wav_file)
 
