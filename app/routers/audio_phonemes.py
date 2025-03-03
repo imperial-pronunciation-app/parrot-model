@@ -21,13 +21,15 @@ async def phonemes(lang: str, audio_file: UploadFile, attempt_word: Annotated[st
     audio_bytes = await audio_file.read()
     wav_file = create_wav_file(audio_bytes)
     
-    trim_audio(wav_file, attempt_word)
+    success = trim_audio(wav_file, attempt_word)
+    if not success:
+        return InferPhonemesResponse(phonemes=[], success=False)
 
     process_audio(wav_file)
 
-    return InferPhonemesResponse(phonemes=infer_phonemes(wav_file, lang))
+    return InferPhonemesResponse(phonemes=infer_phonemes(wav_file, lang), success=True)
 
 # for testing
 @router.get("/api/v1/phones", response_model = InferPhonemesResponse)
 async def get_phonemes() -> InferPhonemesResponse:
-    return InferPhonemesResponse(phonemes = ["a", "b", "c"])
+    return InferPhonemesResponse(phonemes = ["a", "b", "c"], success=True)

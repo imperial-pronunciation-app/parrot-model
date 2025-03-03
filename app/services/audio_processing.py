@@ -17,7 +17,11 @@ def create_wav_file(audio_bytes: bytes) -> str:
         temp_wav.write(audio_bytes)
         return temp_wav.name
 
-def trim_audio(wav_file: str, attempt_word: str) -> None:
+def trim_audio(wav_file: str, attempt_word: str) -> bool:
+    """Trims the audio file to the start and end times of the attempt word.
+    Returns True if the word was found and trimmed, False otherwise.
+    """
+    
     result = ml_models["whisper"].transcribe( # type: ignore
         wav_file,
         word_timestamps=True
@@ -37,7 +41,8 @@ def trim_audio(wav_file: str, attempt_word: str) -> None:
                     safe_end = min(len(audio), end_time * 1000 + BUFFER_MS)
                     trimmed_audio = audio[safe_start:safe_end]
                     trimmed_audio.export(wav_file, format="wav")
-                    break
+                    return True
+    return False
 
 def process_audio(wav_file: str) -> None:
     """Reads a WAV file, reduces noise, and returns processed audio data."""
