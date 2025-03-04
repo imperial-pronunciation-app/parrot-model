@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY ./app /code/app
 
 RUN python -m allosaurus.bin.download_model -m eng2102
+RUN python -m allosaurus.bin.download_model -m uni2005
 
 COPY ./config /code/config
 
