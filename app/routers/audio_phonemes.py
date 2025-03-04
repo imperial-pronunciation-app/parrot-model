@@ -1,17 +1,15 @@
-from typing import Annotated
+from fastapi import APIRouter, HTTPException, UploadFile
 
-from fastapi import APIRouter, Form, HTTPException, UploadFile
-
-from app.schemas.audio_phonemes import InferPhonemesResponse
-from app.services.audio_processing import create_wav_file, process_audio, trim_audio
+from app.schemas.audio_phonemes import InferWordPhonemesResponse
+from app.services.audio_processing import create_wav_file, process_audio, whisper_trim
 from app.services.inference import infer_phonemes
 from config.config import SUPPORTED_LANGUAGES
 
 
 router = APIRouter()
 
-@router.post("/api/v1/{lang}/infer_phonemes", response_model=InferPhonemesResponse)
-async def phonemes(lang: str, audio_file: UploadFile, attempt_word: Annotated[str, Form()]) -> InferPhonemesResponse:
+@router.post("/api/v1/{lang}/infer_word_phonemes", response_model=InferWordPhonemesResponse)
+async def phonemes(lang: str, audio_file: UploadFile) -> InferWordPhonemesResponse:
     if lang not in SUPPORTED_LANGUAGES:
         raise HTTPException(
             status_code=400,
@@ -21,15 +19,10 @@ async def phonemes(lang: str, audio_file: UploadFile, attempt_word: Annotated[st
     audio_bytes = await audio_file.read()
     wav_file = create_wav_file(audio_bytes)
     
-    success = trim_audio(wav_file, attempt_word)
-    if not success:
-        return InferPhonemesResponse(phonemes=[], success=False)
+    words = whisper_trim(wav_file)
+    if not words:
+        return InferWordPhonemesResponse(words=[], phonemes=[], success=False)
 
     process_audio(wav_file)
 
-    return InferPhonemesResponse(phonemes=infer_phonemes(wav_file, lang), success=True)
-
-# for testing
-@router.get("/api/v1/phones", response_model = InferPhonemesResponse)
-async def get_phonemes() -> InferPhonemesResponse:
-    return InferPhonemesResponse(phonemes = ["a", "b", "c"], success=True)
+    return InferWordPhonemesResponse(words=words, phonemes=infer_phonemes(wav_file, lang), success=True)

@@ -1,6 +1,6 @@
 import re
 import tempfile
-from typing import Dict
+from typing import Dict, List, Optional
 
 from noisereduce import reduce_noise
 from pedalboard import Compressor, Gain, LowShelfFilter, NoiseGate, Pedalboard
@@ -17,9 +17,9 @@ def create_wav_file(audio_bytes: bytes) -> str:
         temp_wav.write(audio_bytes)
         return temp_wav.name
 
-def trim_audio(wav_file: str, attempt_word: str) -> bool:
+def whisper_trim(wav_file: str) -> Optional[List[str]]:
     """Trims the audio file to the start and end times of the attempt word.
-    Returns True if the word was found and trimmed, False otherwise.
+    Returns the words if there are 1-2 words found and trimmed, None otherwise.
     """
     
     result = ml_models["whisper"].transcribe( # type: ignore
@@ -31,18 +31,18 @@ def trim_audio(wav_file: str, attempt_word: str) -> bool:
 
     if "segments" in result and result["segments"]:
         if "words" in result["segments"][0]:
-            for word in result["segments"][0]["words"]:
-                if re.sub(r'[\s\W_]+', '', word["word"]).lower() == attempt_word:
-                    start_time = word["start"]
-                    end_time = word["end"]
-                    audio = AudioSegment.from_wav(wav_file)
-
-                    safe_start = max(0, start_time * 1000 - BUFFER_MS)
-                    safe_end = min(len(audio), end_time * 1000 + BUFFER_MS)
-                    trimmed_audio = audio[safe_start:safe_end]
-                    trimmed_audio.export(wav_file, format="wav")
-                    return True
-    return False
+            words = result["segments"][0]["words"]
+            if len(words) == 0 or len(words) > 2:
+                return None
+            start_time = words[0]["start"]
+            end_time = words[-1]["end"]
+            audio = AudioSegment.from_wav(wav_file)
+            safe_start = max(0, start_time * 1000 - BUFFER_MS)
+            safe_end = min(len(audio), end_time * 1000 + BUFFER_MS)
+            trimmed_audio = audio[safe_start:safe_end]
+            trimmed_audio.export(wav_file, format="wav")
+            return list(map(lambda word: re.sub(r'[\s\W_]+', '', word["word"]).lower(), words))
+    return None
 
 def process_audio(wav_file: str) -> None:
     """Reads a WAV file, reduces noise, and returns processed audio data."""
