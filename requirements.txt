@@ -6,3 +6,4 @@ noisereduce
 pedalboard
 openai-whisper
 pydub
+gtts
