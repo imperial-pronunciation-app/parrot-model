@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, UploadFile
 
 from app.schemas.audio_phonemes import InferWordPhonemesResponse
-from app.services.audio_processing import create_wav_file, process_audio, whisper_trim
-from app.services.inference import infer_phonemes
+from app.services.audio_processing import create_wav_file
+from app.services.inference import infer_word_and_phonemes
 from config.config import SUPPORTED_LANGUAGES
 
 
@@ -19,10 +19,4 @@ async def phonemes(lang: str, audio_file: UploadFile) -> InferWordPhonemesRespon
     audio_bytes = await audio_file.read()
     wav_file = create_wav_file(audio_bytes)
     
-    words = whisper_trim(wav_file)
-    if not words:
-        return InferWordPhonemesResponse(words=[], phonemes=[], success=False)
-
-    process_audio(wav_file)
-
-    return InferWordPhonemesResponse(words=words, phonemes=infer_phonemes(wav_file, lang), success=True)
+    return infer_word_and_phonemes(wav_file, lang)
