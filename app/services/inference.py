@@ -1,9 +1,10 @@
-import json
 from argparse import Namespace
-from typing import Dict, List, cast
+from typing import List
 
 from allosaurus.app import read_recognizer
 
+from app.schemas.audio_phonemes import InferWordPhonemesResponse
+from app.services.audio_processing import process_audio, whisper_trim
 from config.config import MODELS_FOR_LANGUAGES
 
 
@@ -25,7 +26,15 @@ def infer_phonemes(wav_file: str, lang: str) -> List[str]:
     recognizer = read_recognizer(inference_config_or_name=inference_config)
     return str(recognizer.recognize(wav_file, lang_id=lang)).split(" ")
 
-def load_phoneme_mapping(lang: str) -> Dict[str, str]:
-    """Loads phoneme mapping for a given language from a JSON file."""
-    with open(f'config/languages/{lang}/phone_to_phonemes.json', 'r') as f:
-        return cast(Dict[str, str], json.load(f))
+
+def infer_word_and_phonemes(
+    wav_file: str, 
+    lang: str
+) -> InferWordPhonemesResponse:
+    words = whisper_trim(wav_file)
+    if not words:
+        return InferWordPhonemesResponse(words=[], phonemes=[], success=False)
+
+    process_audio(wav_file)
+
+    return InferWordPhonemesResponse(words=words, phonemes=infer_phonemes(wav_file, lang), success=True)
