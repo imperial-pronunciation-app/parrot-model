@@ -100,7 +100,7 @@ jobs:
           scp ./deploy.sh cloud-vm:~/deploy.sh
           scp ./nginx.conf cloud-vm:~/nginx.conf
           scp ./docker-compose.yml cloud-vm:~/docker-compose.yml
-          ssh cloud-vm "chmod +x ~/deploy.sh && \
+          ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=5 cloud-vm "chmod +x ~/deploy.sh && \
                         DOCKERHUB_USERNAME='${{ vars.DOCKERHUB_USERNAME }}' \
                         DOCKERHUB_ACCESS_TOKEN='${{ secrets.DOCKERHUB_ACCESS_TOKEN }}' \
                         IMAGE_NAME='${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' \
