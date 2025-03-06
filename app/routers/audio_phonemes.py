@@ -19,7 +19,7 @@ async def phonemes(lang: str, audio_file: UploadFile) -> InferWordPhonemesRespon
     audio_bytes = await audio_file.read()
     wav_file = create_wav_file(audio_bytes)
     
-    words = whisper_trim(wav_file)
+    words = whisper_trim(wav_file, lang)
     if not words:
         return InferWordPhonemesResponse(words=[], phonemes=[], success=False)
 

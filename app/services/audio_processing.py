@@ -7,6 +7,8 @@ from pedalboard import Compressor, Gain, LowShelfFilter, NoiseGate, Pedalboard
 from pedalboard.io import AudioFile
 from pydub import AudioSegment
 
+from config.config import WHISPER_LANG_CODES
+
 
 ml_models: Dict[str, None] = {}
 BUFFER_MS = 250
@@ -17,14 +19,15 @@ def create_wav_file(audio_bytes: bytes) -> str:
         temp_wav.write(audio_bytes)
         return temp_wav.name
 
-def whisper_trim(wav_file: str) -> Optional[List[str]]:
+def whisper_trim(wav_file: str, lang: str) -> Optional[List[str]]:
     """Trims the audio file to the start and end times of the attempt word.
     Returns the words if there are 1-2 words found and trimmed, None otherwise.
     """
     
     result = ml_models["whisper"].transcribe( # type: ignore
         wav_file,
-        word_timestamps=True
+        word_timestamps=True,
+        language=WHISPER_LANG_CODES[lang],
     )
     
     start_time, end_time = None, None
