@@ -2,11 +2,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from config.config import SUPPORTED_LANGUAGES
+from config.config import SUPPORTED_LANGUAGES, Language
 
 
 @pytest.mark.parametrize("lang", SUPPORTED_LANGUAGES)
-def test_valid_phoneme_inference(lang: str) -> None:
+def test_valid_phoneme_inference(lang: Language) -> None:
     with TestClient(app) as client:
         with open('tests/assets/hello.wav', 'rb') as f:
             files = {"audio_file": f}
@@ -18,7 +18,7 @@ def test_valid_phoneme_inference(lang: str) -> None:
         assert data["words"] == ["hello"]
 
 @pytest.mark.parametrize("lang", SUPPORTED_LANGUAGES)
-def test_garbage_detection(lang: str) -> None:
+def test_garbage_detection(lang: Language) -> None:
     with TestClient(app) as client:
         with open('tests/assets/i_am_a_mouse.wav', 'rb') as f:
             files = {"audio_file": f}
