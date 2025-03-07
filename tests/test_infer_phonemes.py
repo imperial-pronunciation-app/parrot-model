@@ -33,8 +33,9 @@ def test_valid_phoneme_and_word_inference(client: TestClient, hello_wav: bytes, 
     assert response.status_code == 200
     data = response.json()
     assert data["success"]
-    assert data["phonemes"] is not None
-    assert data["words"] == ["hello"]
+    feedback = data["feedback"]
+    assert feedback["phonemes"] is not None
+    assert feedback["words"] == ["hello"]
 
 @pytest.mark.parametrize("lang", SUPPORTED_LANGUAGES)
 def test_valid_phoneme_inference(client: TestClient, hello_wav: bytes, lang: Language) -> None:
@@ -45,7 +46,8 @@ def test_valid_phoneme_inference(client: TestClient, hello_wav: bytes, lang: Lan
     assert response.status_code == 200
     data = response.json()
     assert data["success"]
-    assert data["phonemes"] is not None
+    feedback = data["feedback"]
+    assert feedback["phonemes"] is not None
 
 @pytest.mark.parametrize("lang", GARBAGE_DETECTABLE_LANGUAGES)
 def test_garbage_detection(client: TestClient, garbage_wav: bytes, lang: Language) -> None:
@@ -56,8 +58,8 @@ def test_garbage_detection(client: TestClient, garbage_wav: bytes, lang: Languag
     assert response.status_code == 200
     data = response.json()
     assert not data["success"]
-    assert data["phonemes"] == []
-    assert data["words"] == []
+    feedback = data["feedback"]
+    assert feedback is None
 
 def test_invalid_language(client: TestClient) -> None:
     response = client.post(
