@@ -1,10 +1,12 @@
+from pathlib import Path
 from typing import Generator
+
 import pytest
 from fastapi.testclient import TestClient
-from pathlib import Path
 
 from app.main import app
 from config.config import GARBAGE_DETECTABLE_LANGUAGES, SUPPORTED_LANGUAGES, Language
+
 
 @pytest.fixture(scope="module")
 def client() -> Generator[TestClient, None, None]:
