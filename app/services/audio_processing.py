@@ -47,7 +47,17 @@ def whisper_trim(wav_file: str) -> Optional[List[str]]:
 def process_audio(wav_file: str) -> None:
     """Reads a WAV file, reduces noise, and returns processed audio data."""
     with AudioFile(wav_file).resampled_to(SAMPLE_RATE) as f:
-        audio = f.read(f.frames)
+        audio = []
+        CHUNKSIZE = 1024
+        while True:
+            chunk = f.read(chunksize=CHUNKSIZE)
+            if not chunk or len(chunk) == 0:
+                break
+            audio.extend(chunk)
+
+    if len(audio) == 0:
+        return
+    
     reduced_noise = reduce_noise(y=audio, sr=SAMPLE_RATE, stationary=True, prop_decrease=0.8)
     board = Pedalboard([
         NoiseGate(threshold_db=-20, ratio=2, release_ms=250),
