@@ -20,7 +20,11 @@ async def phonemes(lang: Language, audio_file: UploadFile) -> PronunciationInfer
     else:
         words = None
 
-    process_audio(wav_file)
+    try:
+        process_audio(wav_file)
+    except Exception:
+        return PronunciationInferenceResponse(success=False, feedback=None)
+
 
     return PronunciationInferenceResponse(
         success=True,
